@@ -20,6 +20,9 @@ public class Vigil {
 
         Scanner scanner = new Scanner(System.in);
 
+        String[] tasks = new String[100];
+        int taskCount = 0;
+
         while (true) {
             String line = scanner.nextLine();
 
@@ -28,7 +31,18 @@ public class Vigil {
             }
 
             System.out.println("____________________________________________________________");
-            System.out.println(" " + line);
+
+            if (line.equalsIgnoreCase("list")) {
+                for (int i = 0; i < taskCount; i++) {
+                    System.out.println((i + 1) + ". " + tasks[i]);
+                }
+            } else {
+                tasks[taskCount] = line;
+                taskCount++;
+
+                System.out.println("added: " + line);
+            }
+
             System.out.println("____________________________________________________________");
         }
 
@@ -39,4 +53,5 @@ public class Vigil {
         scanner.close();
     }
 }
+
 
