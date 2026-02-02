@@ -49,6 +49,17 @@ public class Vigil {
                 tasks[taskIndex].markAsNotDone();
                 System.out.println("Vigil notes this task is no longer complete:");
                 System.out.println("  " + tasks[taskIndex]);
+            } else if (line.startsWith("todo ")) {
+                String description = line.substring(5).trim();
+
+                if (description.isEmpty()) {
+                    System.out.println("Vigil reports an incomplete task entry. Description required.");
+                } else {
+                    Task task = new Todo(description);
+                    tasks[taskCount] = task;
+                    taskCount++;
+                    printTaskAdded(task, taskCount);
+                }
             } else {
                 tasks[taskCount] = new Task(line);
                 taskCount++;
@@ -63,6 +74,12 @@ public class Vigil {
         System.out.println("____________________________________________________________");
 
         scanner.close();
+    }
+
+    private static void printTaskAdded(Task task, int taskCount) {
+        System.out.println("Vigil acknowledges. Task successfully recorded:");
+        System.out.println("  " + task);
+        System.out.println(taskCount + " tasks currently under Vigil’s watch.");
     }
 }
 
