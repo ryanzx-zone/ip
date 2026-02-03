@@ -65,12 +65,31 @@ public class Vigil {
                 String[] parts = rest.split(" /by ", 2);
 
                 if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
-                    System.out.println("Deadline entry invalid. Use: deadline <description> /by <time>");
+                    System.out.println("Deadline entry is invalid. Use: deadline <description> /by <time>");
                 } else {
                     Task task = new Deadline(parts[0].trim(), parts[1].trim());
                     tasks[taskCount] = task;
                     taskCount++;
                     printTaskAdded(task, taskCount);
+                }
+            } else if (line.startsWith("event ")) {
+                String rest = line.substring(6).trim();
+                String[] firstSplit = rest.split(" /from ", 2);
+
+                if (firstSplit.length < 2 || firstSplit[0].trim().isEmpty()) {
+                    System.out.println("Event entry is invalid. Use: event <desc> /from <start> /to <end>");
+                } else {
+                    String desc = firstSplit[0].trim();
+                    String[] secondSplit = firstSplit[1].split(" /to ", 2);
+
+                    if (secondSplit.length < 2 || secondSplit[0].trim().isEmpty() || secondSplit[1].trim().isEmpty()) {
+                        System.out.println("Event entry is invalid. Use: event <desc> /from <start> /to <end>");
+                    } else {
+                        Task task = new Event(desc, secondSplit[0].trim(), secondSplit[1].trim());
+                        tasks[taskCount] = task;
+                        taskCount++;
+                        printTaskAdded(task, taskCount);
+                    }
                 }
 
             } else {
