@@ -53,13 +53,26 @@ public class Vigil {
                 String description = line.substring(5).trim();
 
                 if (description.isEmpty()) {
-                    System.out.println("Vigil reports an incomplete task entry. Description required.");
+                    System.out.println("Task entry incomplete. Description required.");
                 } else {
                     Task task = new Todo(description);
                     tasks[taskCount] = task;
                     taskCount++;
                     printTaskAdded(task, taskCount);
                 }
+            } else if (line.startsWith("deadline ")) {
+                String rest = line.substring(9).trim();
+                String[] parts = rest.split(" /by ", 2);
+
+                if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
+                    System.out.println("Deadline entry invalid. Use: deadline <description> /by <time>");
+                } else {
+                    Task task = new Deadline(parts[0].trim(), parts[1].trim());
+                    tasks[taskCount] = task;
+                    taskCount++;
+                    printTaskAdded(task, taskCount);
+                }
+
             } else {
                 tasks[taskCount] = new Task(line);
                 taskCount++;
