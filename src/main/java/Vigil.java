@@ -13,10 +13,10 @@ public class Vigil {
 
 
         System.out.println(logo);
-        System.out.println("____________________________________________________________");
+        printDivider();
         System.out.println("Hello! Vigil is online.");
         System.out.println("What can I do for you today?");
-        System.out.println("____________________________________________________________");
+        printDivider();
 
         Scanner scanner = new Scanner(System.in);
 
@@ -30,7 +30,7 @@ public class Vigil {
                 break;
             }
 
-            System.out.println("____________________________________________________________");
+            printDivider();
 
             if (line.equalsIgnoreCase("list")) {
                 System.out.println("Vigil scan complete. Here’s your task list:");
@@ -98,12 +98,12 @@ public class Vigil {
                 System.out.println("added: " + line);
             }
 
-            System.out.println("____________________________________________________________");
+            printDivider();
         }
 
-        System.out.println("____________________________________________________________");
+        printDivider();
         System.out.println("Goodbye. Hope to see you again soon! Vigil is going offline.");
-        System.out.println("____________________________________________________________");
+        printDivider();
 
         scanner.close();
     }
@@ -113,6 +113,11 @@ public class Vigil {
         System.out.println("  " + task);
         System.out.println(taskCount + " tasks currently under Vigil’s watch.");
     }
+
+    private static void printDivider() {
+        System.out.println("____________________________________________________________");
+    }
 }
+
 
 
