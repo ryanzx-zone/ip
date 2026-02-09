@@ -1,4 +1,12 @@
+package vigil;
+
 import java.util.Scanner;
+
+import vigil.exception.VigilException;
+import vigil.task.Deadline;
+import vigil.task.Event;
+import vigil.task.Task;
+import vigil.task.Todo;
 
 public class Vigil {
     public static void main(String[] args) {

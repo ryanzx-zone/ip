@@ -1,4 +1,6 @@
 @ECHO OFF
+setlocal
+cd /d "%~dp0"
 
 REM create bin directory if it doesn't exist
 if not exist ..\bin mkdir ..\bin
@@ -8,14 +10,18 @@ if exist ACTUAL.TXT del ACTUAL.TXT
 if exist ACTUAL_FILTERED.TXT del ACTUAL_FILTERED.TXT
 
 REM compile the code into the bin folder
-javac -encoding UTF-8 -cp ..\src\main\java -Xlint:none -d ..\bin ..\src\main\java\*.java
+javac -encoding UTF-8 -Xlint:none -d ..\bin ^
+  ..\src\main\java\vigil\*.java ^
+  ..\src\main\java\vigil\exception\*.java ^
+  ..\src\main\java\vigil\task\*.java
+
 IF ERRORLEVEL 1 (
     echo ********** BUILD FAILURE **********
     exit /b 1
 )
 
 REM run the program, feed commands from input.txt file and redirect the output to the ACTUAL.TXT
-java -classpath ..\bin Vigil < input.txt > ACTUAL.TXT
+java -classpath ..\bin vigil.Vigil < input.txt > ACTUAL.TXT
 
 REM filter out ASCII logo: keep lines from first divider onwards
 powershell -NoProfile -Command ^
