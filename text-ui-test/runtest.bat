@@ -20,7 +20,7 @@ java -classpath ..\bin Vigil < input.txt > ACTUAL.TXT
 REM filter out ASCII logo: keep lines from first divider onwards
 powershell -NoProfile -Command ^
   "$lines = Get-Content 'ACTUAL.TXT';" ^
-  "$idx = $lines.IndexOf('____________________________________________________________');" ^
+  "$idx = $lines.IndexOf('_______________________________________________________________________________');" ^
   "if ($idx -lt 0) { $lines | Set-Content 'ACTUAL_FILTERED.TXT' } else { $lines[$idx..($lines.Length-1)] | Set-Content 'ACTUAL_FILTERED.TXT' }"
 
 REM compare the output to the expected output
