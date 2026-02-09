@@ -33,7 +33,7 @@ public class Vigil {
             printDivider();
 
             if (line.equalsIgnoreCase("list")) {
-                System.out.println("Vigil scan complete. Here’s your task list:");
+                System.out.println("Vigil scan complete. Here's your task list:");
                 for (int i = 0; i < taskCount; i++) {
                     System.out.println((i + 1) + ". " + tasks[i]);
                 }
@@ -111,7 +111,7 @@ public class Vigil {
     private static void printTaskAdded(Task task, int taskCount) {
         System.out.println("Vigil acknowledges. Task successfully recorded:");
         System.out.println("  " + task);
-        System.out.println(taskCount + " tasks currently under Vigil’s watch.");
+        System.out.println(taskCount + " tasks currently under Vigil's watch.");
     }
 
     private static void printDivider() {

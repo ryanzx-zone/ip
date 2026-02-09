@@ -1,0 +1,9 @@
+todo read book
+deadline submit report /by sunday
+event project meeting /from 2pm /to 4pm
+list
+mark 2
+list
+unmark 2
+list
+bye

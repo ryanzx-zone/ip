@@ -5,17 +5,23 @@ if not exist ..\bin mkdir ..\bin
 
 REM delete output from previous run
 if exist ACTUAL.TXT del ACTUAL.TXT
+if exist ACTUAL_FILTERED.TXT del ACTUAL_FILTERED.TXT
 
 REM compile the code into the bin folder
-javac  -cp ..\src\main\java -Xlint:none -d ..\bin ..\src\main\java\*.java
+javac -encoding UTF-8 -cp ..\src\main\java -Xlint:none -d ..\bin ..\src\main\java\*.java
 IF ERRORLEVEL 1 (
     echo ********** BUILD FAILURE **********
     exit /b 1
 )
-REM no error here, errorlevel == 0
 
 REM run the program, feed commands from input.txt file and redirect the output to the ACTUAL.TXT
-java -classpath ..\bin Duke < input.txt > ACTUAL.TXT
+java -classpath ..\bin Vigil < input.txt > ACTUAL.TXT
+
+REM filter out ASCII logo: keep lines from first divider onwards
+powershell -NoProfile -Command ^
+  "$lines = Get-Content 'ACTUAL.TXT';" ^
+  "$idx = $lines.IndexOf('____________________________________________________________');" ^
+  "if ($idx -lt 0) { $lines | Set-Content 'ACTUAL_FILTERED.TXT' } else { $lines[$idx..($lines.Length-1)] | Set-Content 'ACTUAL_FILTERED.TXT' }"
 
 REM compare the output to the expected output
-FC ACTUAL.TXT EXPECTED.TXT
+FC ACTUAL_FILTERED.TXT EXPECTED.TXT
