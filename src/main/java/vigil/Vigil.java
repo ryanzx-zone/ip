@@ -1,5 +1,6 @@
 package vigil;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import vigil.exception.VigilException;
@@ -10,14 +11,13 @@ import vigil.task.Todo;
 
 public class Vigil {
 
-    private static final int MAX_TASKS = 100;
-
     private static final String COMMAND_TODO = "todo";
     private static final String COMMAND_MARK = "mark";
     private static final String COMMAND_UNMARK = "unmark";
     private static final String COMMAND_DEADLINE = "deadline";
     private static final String COMMAND_EVENT = "event";
     private static final String COMMAND_LIST = "list";
+    private static final String COMMAND_DELETE = "delete";
     private static final String COMMAND_BYE = "bye";
 
     public static void main(String[] args) {
@@ -39,8 +39,7 @@ public class Vigil {
 
         Scanner scanner = new Scanner(System.in);
 
-        Task[] tasks = new Task[MAX_TASKS];
-        int taskCount = 0;
+        ArrayList<Task> tasks = new ArrayList<>();
 
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine().trim();
@@ -54,40 +53,43 @@ public class Vigil {
             try {
                 if (line.equalsIgnoreCase(COMMAND_LIST)) {
                     System.out.println("Vigil scan complete. Here's your task list:");
-                    for (int i = 0; i < taskCount; i++) {
-                        System.out.println((i + 1) + ". " + tasks[i]);
+                    for (int i = 0; i < tasks.size(); i++) {
+                        System.out.println((i + 1) + ". " + tasks.get(i));
                     }
 
-                } else if (line.equals(COMMAND_TODO) || line.startsWith("todo ")) {
-                    String description = line.equals(COMMAND_TODO) ? "" : line.substring(5).trim();
+                } else if (line.equals(COMMAND_TODO) || line.startsWith(COMMAND_TODO + " ")) {
+                    String description = line.equals(COMMAND_TODO)
+                            ? ""
+                            : line.substring(COMMAND_TODO.length()).trim();
                     if (description.isEmpty()) {
                         throw new VigilException("Task entry incomplete. A todo needs a description.");
                     }
                     Task task = new Todo(description);
-                    tasks[taskCount] = task;
-                    taskCount++;
-                    printTaskAdded(task, taskCount);
+                    tasks.add(task);
+                    printTaskAdded(task, tasks.size());
 
-                } else if (line.equals(COMMAND_MARK) || line.startsWith("mark ")) {
+                } else if (line.equals(COMMAND_MARK) || line.startsWith(COMMAND_MARK + " ")) {
                     if (line.equals(COMMAND_MARK)) {
                         throw new VigilException("Missing task number. Use: mark <task number>.");
                     }
-                    int taskIndex = parseTaskIndex(line.substring(5).trim(), taskCount);
-                    tasks[taskIndex].markAsDone();
+                    int taskIndex = parseTaskIndex(line.substring(COMMAND_MARK.length()).trim(), tasks.size());
+                    tasks.get(taskIndex).markAsDone();
                     System.out.println("Vigil confirms this task is now complete:");
-                    System.out.println("  " + tasks[taskIndex]);
+                    System.out.println("  " + tasks.get(taskIndex));
 
-                } else if (line.equals(COMMAND_UNMARK) || line.startsWith("unmark ")) {
+                } else if (line.equals(COMMAND_UNMARK) || line.startsWith(COMMAND_UNMARK + " ")) {
                     if (line.equals(COMMAND_UNMARK)) {
                         throw new VigilException("Missing task number. Use: unmark <task number>.");
                     }
-                    int taskIndex = parseTaskIndex(line.substring(7).trim(), taskCount);
-                    tasks[taskIndex].markAsNotDone();
+                    int taskIndex = parseTaskIndex(line.substring(COMMAND_UNMARK.length()).trim(), tasks.size());
+                    tasks.get(taskIndex).markAsNotDone();
                     System.out.println("Vigil notes this task is no longer complete:");
-                    System.out.println("  " + tasks[taskIndex]);
+                    System.out.println("  " + tasks.get(taskIndex));
 
-                } else if (line.equals(COMMAND_DEADLINE) || line.startsWith("deadline ")) {
-                    String rest = line.equals(COMMAND_DEADLINE) ? "" : line.substring(9).trim();
+                } else if (line.equals(COMMAND_DEADLINE) || line.startsWith(COMMAND_DEADLINE + " ")) {
+                    String rest = line.equals(COMMAND_DEADLINE)
+                            ? ""
+                            : line.substring(COMMAND_DEADLINE.length()).trim();
                     String[] parts = rest.split(" /by ", 2);
 
                     if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
@@ -95,12 +97,13 @@ public class Vigil {
                     }
 
                     Task task = new Deadline(parts[0].trim(), parts[1].trim());
-                    tasks[taskCount] = task;
-                    taskCount++;
-                    printTaskAdded(task, taskCount);
+                    tasks.add(task);
+                    printTaskAdded(task, tasks.size());
 
-                } else if (line.equals(COMMAND_EVENT) || line.startsWith("event ")) {
-                    String rest = line.equals(COMMAND_EVENT) ? "" : line.substring(6).trim();
+                } else if (line.equals(COMMAND_EVENT) || line.startsWith(COMMAND_EVENT + " ")) {
+                    String rest = line.equals(COMMAND_EVENT)
+                            ? ""
+                            : line.substring(COMMAND_EVENT.length()).trim();
                     String[] firstSplit = rest.split(" /from ", 2);
 
                     if (firstSplit.length < 2 || firstSplit[0].trim().isEmpty()) {
@@ -115,9 +118,20 @@ public class Vigil {
                     }
 
                     Task task = new Event(desc, secondSplit[0].trim(), secondSplit[1].trim());
-                    tasks[taskCount] = task;
-                    taskCount++;
-                    printTaskAdded(task, taskCount);
+                    tasks.add(task);
+                    printTaskAdded(task, tasks.size());
+
+                } else if (line.equals(COMMAND_DELETE) || line.startsWith(COMMAND_DELETE + " ")) {
+                    if (line.equals(COMMAND_DELETE)) {
+                        throw new VigilException("Missing task number. Use: delete <task number>.");
+                    }
+
+                    int taskIndex = parseTaskIndex(line.substring(COMMAND_DELETE.length()).trim(), tasks.size());
+                    Task removedTask = tasks.remove(taskIndex);
+
+                    System.out.println("Vigil confirms termination. Task removed:");
+                    System.out.println("  " + removedTask);
+                    System.out.println(tasks.size() + " tasks currently under Vigil's watch.");
 
                 } else {
                     throw new VigilException("Command not recognised.");
@@ -144,11 +158,15 @@ public class Vigil {
     }
 
     private static int parseTaskIndex(String raw, int taskCount) throws VigilException {
+        if (taskCount == 0) {
+            throw new VigilException("No tasks found. Add a task first.");
+        }
+
         int taskNumber;
         try {
             taskNumber = Integer.parseInt(raw);
         } catch (NumberFormatException e) {
-            throw new VigilException("Invalid task number. Please enter a positive integer.");
+            throw new VigilException("Invalid task number.");
         }
 
         int taskIndex = taskNumber - 1;
