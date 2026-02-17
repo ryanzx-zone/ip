@@ -3,6 +3,7 @@ package vigil;
 import java.util.Scanner;
 
 import vigil.exception.VigilException;
+import vigil.storage.Storage;
 import vigil.task.Deadline;
 import vigil.task.Event;
 import vigil.task.Task;
@@ -19,6 +20,9 @@ public class Vigil {
     private static final String COMMAND_EVENT = "event";
     private static final String COMMAND_LIST = "list";
     private static final String COMMAND_BYE = "bye";
+
+    private static final String DATA_FOLDER = "data";
+    private static final String DATA_FILE = "vigil.txt";
 
     public static void main(String[] args) {
         String logo = """
@@ -38,9 +42,24 @@ public class Vigil {
         printDivider();
 
         Scanner scanner = new Scanner(System.in);
+        Storage storage = new Storage(DATA_FOLDER, DATA_FILE);
 
         Task[] tasks = new Task[MAX_TASKS];
         int taskCount = 0;
+
+        try {
+            Task[] loadedTasks = storage.load();
+            for (Task task : loadedTasks) {
+                if (taskCount >= MAX_TASKS) {
+                    break;
+                }
+                tasks[taskCount] = task;
+                taskCount++;
+            }
+        } catch (VigilException e) {
+            System.out.println("Vigil alert: " + e.getMessage());
+            System.out.println("Vigil will start with an empty task list.");
+        }
 
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine().trim();
@@ -59,21 +78,32 @@ public class Vigil {
                     }
 
                 } else if (line.equals(COMMAND_TODO) || line.startsWith("todo ")) {
-                    String description = line.equals(COMMAND_TODO) ? "" : line.substring(5).trim();
+                    ensureCapacity(taskCount);
+
+                    String description = line.equals(COMMAND_TODO)
+                            ? ""
+                            : line.substring(COMMAND_TODO.length()).trim();
                     if (description.isEmpty()) {
                         throw new VigilException("Task entry incomplete. A todo needs a description.");
                     }
+
                     Task task = new Todo(description);
                     tasks[taskCount] = task;
                     taskCount++;
+
+                    storage.save(tasks, taskCount);
                     printTaskAdded(task, taskCount);
 
                 } else if (line.equals(COMMAND_MARK) || line.startsWith("mark ")) {
                     if (line.equals(COMMAND_MARK)) {
                         throw new VigilException("Missing task number. Use: mark <task number>.");
                     }
-                    int taskIndex = parseTaskIndex(line.substring(5).trim(), taskCount);
+
+                    int taskIndex = parseTaskIndex(line.substring(COMMAND_MARK.length()).trim(), taskCount);
                     tasks[taskIndex].markAsDone();
+
+                    storage.save(tasks, taskCount);
+
                     System.out.println("Vigil confirms this task is now complete:");
                     System.out.println("  " + tasks[taskIndex]);
 
@@ -81,13 +111,20 @@ public class Vigil {
                     if (line.equals(COMMAND_UNMARK)) {
                         throw new VigilException("Missing task number. Use: unmark <task number>.");
                     }
-                    int taskIndex = parseTaskIndex(line.substring(7).trim(), taskCount);
+
+                    int taskIndex = parseTaskIndex(line.substring(COMMAND_UNMARK.length()).trim(), taskCount);
                     tasks[taskIndex].markAsNotDone();
+
+                    storage.save(tasks, taskCount);
+
                     System.out.println("Vigil notes this task is no longer complete:");
                     System.out.println("  " + tasks[taskIndex]);
 
                 } else if (line.equals(COMMAND_DEADLINE) || line.startsWith("deadline ")) {
-                    String rest = line.equals(COMMAND_DEADLINE) ? "" : line.substring(9).trim();
+                    ensureCapacity(taskCount);
+
+                    String rest = line.equals(COMMAND_DEADLINE) ? ""
+                            : line.substring(COMMAND_DEADLINE.length()).trim();
                     String[] parts = rest.split(" /by ", 2);
 
                     if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
@@ -97,10 +134,15 @@ public class Vigil {
                     Task task = new Deadline(parts[0].trim(), parts[1].trim());
                     tasks[taskCount] = task;
                     taskCount++;
+
+                    storage.save(tasks, taskCount);
                     printTaskAdded(task, taskCount);
 
                 } else if (line.equals(COMMAND_EVENT) || line.startsWith("event ")) {
-                    String rest = line.equals(COMMAND_EVENT) ? "" : line.substring(6).trim();
+                    ensureCapacity(taskCount);
+
+                    String rest = line.equals(COMMAND_EVENT) ? ""
+                            : line.substring(COMMAND_EVENT.length()).trim();
                     String[] firstSplit = rest.split(" /from ", 2);
 
                     if (firstSplit.length < 2 || firstSplit[0].trim().isEmpty()) {
@@ -117,6 +159,8 @@ public class Vigil {
                     Task task = new Event(desc, secondSplit[0].trim(), secondSplit[1].trim());
                     tasks[taskCount] = task;
                     taskCount++;
+
+                    storage.save(tasks, taskCount);
                     printTaskAdded(task, taskCount);
 
                 } else {
@@ -125,12 +169,19 @@ public class Vigil {
             } catch (VigilException e) {
                 System.out.println("Vigil alert: " + e.getMessage());
             }
-            printDivider();
 
+            printDivider();
         }
+
         printDivider();
         System.out.println("Goodbye. Hope to see you again soon! Vigil is going offline.");
         printDivider();
+    }
+
+    private static void ensureCapacity(int taskCount) throws VigilException {
+        if (taskCount >= MAX_TASKS) {
+            throw new VigilException("Task limit reached. Cannot add more than " + MAX_TASKS + " tasks.");
+        }
     }
 
     private static void printTaskAdded(Task task, int taskCount) {
@@ -158,6 +209,3 @@ public class Vigil {
         return taskIndex;
     }
 }
-
-
-
