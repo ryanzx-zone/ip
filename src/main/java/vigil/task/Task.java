@@ -17,6 +17,14 @@ public class Task {
         isDone = false;
     }
 
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
     @Override
     public String toString() {
         String statusIcon = isDone ? "X" : " ";
