@@ -1,7 +1,5 @@
 package vigil;
 
-import java.util.Scanner;
-
 import vigil.exception.VigilException;
 import vigil.storage.Storage;
 import vigil.task.Deadline;
@@ -9,6 +7,7 @@ import vigil.task.Event;
 import vigil.task.Task;
 import vigil.task.TaskList;
 import vigil.task.Todo;
+import vigil.ui.Ui;
 
 public class Vigil {
 
@@ -25,48 +24,31 @@ public class Vigil {
     private static final String DATA_FILE = "vigil.txt";
 
     public static void main(String[] args) {
-        String logo = """
-                ██╗   ██╗██╗ ██████╗ ██╗██╗
-                ██║   ██║██║██╔════╝ ██║██║
-                ██║   ██║██║██║  ███╗██║██║
-                ╚██╗ ██╔╝██║██║   ██║██║██║
-                 ╚████╔╝ ██║╚██████╔╝██║███████╗
-                  ╚═══╝  ╚═╝ ╚═════╝ ╚═╝╚══════╝
-                """;
-
-        System.out.println(logo);
-        printDivider();
-        System.out.println("Hello! Vigil is online.");
-        System.out.println("What can I do for you today?");
-        printDivider();
-
-        Scanner scanner = new Scanner(System.in);
+        Ui ui = new Ui();
         Storage storage = new Storage(DATA_FOLDER, DATA_FILE);
+
+        ui.showWelcome();
 
         TaskList tasks;
         try {
             tasks = new TaskList(storage.load());
         } catch (VigilException e) {
-            System.out.println("Vigil alert: " + e.getMessage());
-            System.out.println("Vigil will start with an empty task list.");
+            ui.showLoadingError(e.getMessage());
             tasks = new TaskList();
         }
 
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine().trim();
+        while (ui.hasNextLine()) {
+            String line = ui.readCommand();
 
             if (line.equalsIgnoreCase(COMMAND_BYE)) {
                 break;
             }
 
-            printDivider();
+            ui.showDivider();
 
             try {
                 if (line.equalsIgnoreCase(COMMAND_LIST)) {
-                    System.out.println("Vigil scan complete. Here's your task list:");
-                    for (int i = 0; i < tasks.size(); i++) {
-                        System.out.println((i + 1) + ". " + tasks.get(i));
-                    }
+                    ui.showTaskList(tasks);
 
                 } else if (line.equals(COMMAND_TODO) || line.startsWith(COMMAND_TODO + " ")) {
                     String description = line.equals(COMMAND_TODO)
@@ -79,7 +61,7 @@ public class Vigil {
                     Task task = new Todo(description);
                     tasks.add(task);
                     saveTasks(storage, tasks);
-                    printTaskAdded(task, tasks.size());
+                    ui.showTaskAdded(task, tasks.size());
 
                 } else if (line.equals(COMMAND_MARK) || line.startsWith(COMMAND_MARK + " ")) {
                     if (line.equals(COMMAND_MARK)) {
@@ -89,9 +71,7 @@ public class Vigil {
                     int taskIndex = tasks.parseTaskIndex(line.substring(COMMAND_MARK.length()).trim());
                     tasks.get(taskIndex).markAsDone();
                     saveTasks(storage, tasks);
-
-                    System.out.println("Vigil confirms this task is now complete:");
-                    System.out.println("  " + tasks.get(taskIndex));
+                    ui.showMarkDone(tasks.get(taskIndex));
 
                 } else if (line.equals(COMMAND_UNMARK) || line.startsWith(COMMAND_UNMARK + " ")) {
                     if (line.equals(COMMAND_UNMARK)) {
@@ -101,9 +81,7 @@ public class Vigil {
                     int taskIndex = tasks.parseTaskIndex(line.substring(COMMAND_UNMARK.length()).trim());
                     tasks.get(taskIndex).markAsNotDone();
                     saveTasks(storage, tasks);
-
-                    System.out.println("Vigil notes this task is no longer complete:");
-                    System.out.println("  " + tasks.get(taskIndex));
+                    ui.showUnmarkDone(tasks.get(taskIndex));
 
                 } else if (line.equals(COMMAND_DEADLINE) || line.startsWith(COMMAND_DEADLINE + " ")) {
                     String rest = line.equals(COMMAND_DEADLINE)
@@ -118,7 +96,7 @@ public class Vigil {
                     Task task = new Deadline(parts[0].trim(), parts[1].trim());
                     tasks.add(task);
                     saveTasks(storage, tasks);
-                    printTaskAdded(task, tasks.size());
+                    ui.showTaskAdded(task, tasks.size());
 
                 } else if (line.equals(COMMAND_EVENT) || line.startsWith(COMMAND_EVENT + " ")) {
                     String rest = line.equals(COMMAND_EVENT)
@@ -140,7 +118,7 @@ public class Vigil {
                     Task task = new Event(desc, secondSplit[0].trim(), secondSplit[1].trim());
                     tasks.add(task);
                     saveTasks(storage, tasks);
-                    printTaskAdded(task, tasks.size());
+                    ui.showTaskAdded(task, tasks.size());
 
                 } else if (line.equals(COMMAND_DELETE) || line.startsWith(COMMAND_DELETE + " ")) {
                     if (line.equals(COMMAND_DELETE)) {
@@ -150,37 +128,22 @@ public class Vigil {
                     int taskIndex = tasks.parseTaskIndex(line.substring(COMMAND_DELETE.length()).trim());
                     Task removedTask = tasks.delete(taskIndex);
                     saveTasks(storage, tasks);
-
-                    System.out.println("Vigil confirms termination. Task removed:");
-                    System.out.println("  " + removedTask);
-                    System.out.println(tasks.size() + " tasks currently under Vigil's watch.");
+                    ui.showTaskDeleted(removedTask, tasks.size());
 
                 } else {
                     throw new VigilException("Command not recognised.");
                 }
             } catch (VigilException e) {
-                System.out.println("Vigil alert: " + e.getMessage());
+                ui.showError(e.getMessage());
             }
 
-            printDivider();
+            ui.showDivider();
         }
 
-        printDivider();
-        System.out.println("Goodbye. Hope to see you again soon! Vigil is going offline.");
-        printDivider();
+        ui.showGoodbye();
     }
 
     private static void saveTasks(Storage storage, TaskList tasks) throws VigilException {
         storage.save(tasks.toArray(), tasks.size());
-    }
-
-    private static void printTaskAdded(Task task, int taskCount) {
-        System.out.println("Vigil acknowledges. Task successfully recorded:");
-        System.out.println("  " + task);
-        System.out.println(taskCount + " tasks currently under Vigil's watch.");
-    }
-
-    private static void printDivider() {
-        System.out.println("_______________________________________________________________________________");
     }
 }
