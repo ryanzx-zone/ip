@@ -17,7 +17,8 @@ javac -encoding UTF-8 -Xlint:none -d ..\bin ^
   ..\src\main\java\vigil\*.java ^
   ..\src\main\java\vigil\exception\*.java ^
   ..\src\main\java\vigil\task\*.java ^
-  ..\src\main\java\vigil\storage\*.java
+  ..\src\main\java\vigil\storage\*.java ^
+  ..\src\main\java\vigil\ui\*.java
 
 IF ERRORLEVEL 1 (
     echo ********** BUILD FAILURE **********
