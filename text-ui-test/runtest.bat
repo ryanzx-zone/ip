@@ -9,6 +9,9 @@ REM delete output from previous run
 if exist ACTUAL.TXT del ACTUAL.TXT
 if exist ACTUAL_FILTERED.TXT del ACTUAL_FILTERED.TXT
 
+REM delete saved data from previous run
+if exist data\vigil.txt del data\vigil.txt
+
 REM compile the code into the bin folder
 javac -encoding UTF-8 -Xlint:none -d ..\bin ^
   ..\src\main\java\vigil\*.java ^

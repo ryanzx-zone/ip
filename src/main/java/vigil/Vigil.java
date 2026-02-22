@@ -1,6 +1,5 @@
 package vigil;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 
 import vigil.exception.VigilException;
@@ -8,11 +7,10 @@ import vigil.storage.Storage;
 import vigil.task.Deadline;
 import vigil.task.Event;
 import vigil.task.Task;
+import vigil.task.TaskList;
 import vigil.task.Todo;
 
 public class Vigil {
-
-    private static final int MAX_TASKS = 100;
 
     private static final String COMMAND_TODO = "todo";
     private static final String COMMAND_MARK = "mark";
@@ -45,19 +43,13 @@ public class Vigil {
         Scanner scanner = new Scanner(System.in);
         Storage storage = new Storage(DATA_FOLDER, DATA_FILE);
 
-        ArrayList<Task> tasks = new ArrayList<>();
-
+        TaskList tasks;
         try {
-            Task[] loadedTasks = storage.load();
-            for (Task task : loadedTasks) {
-                if (tasks.size() >= MAX_TASKS) {
-                    break;
-                }
-                tasks.add(task);
-            }
+            tasks = new TaskList(storage.load());
         } catch (VigilException e) {
             System.out.println("Vigil alert: " + e.getMessage());
             System.out.println("Vigil will start with an empty task list.");
+            tasks = new TaskList();
         }
 
         while (scanner.hasNextLine()) {
@@ -77,8 +69,6 @@ public class Vigil {
                     }
 
                 } else if (line.equals(COMMAND_TODO) || line.startsWith(COMMAND_TODO + " ")) {
-                    ensureCapacity(tasks.size());
-
                     String description = line.equals(COMMAND_TODO)
                             ? ""
                             : line.substring(COMMAND_TODO.length()).trim();
@@ -96,7 +86,7 @@ public class Vigil {
                         throw new VigilException("Missing task number. Use: mark <task number>.");
                     }
 
-                    int taskIndex = parseTaskIndex(line.substring(COMMAND_MARK.length()).trim(), tasks.size());
+                    int taskIndex = tasks.parseTaskIndex(line.substring(COMMAND_MARK.length()).trim());
                     tasks.get(taskIndex).markAsDone();
                     saveTasks(storage, tasks);
 
@@ -108,7 +98,7 @@ public class Vigil {
                         throw new VigilException("Missing task number. Use: unmark <task number>.");
                     }
 
-                    int taskIndex = parseTaskIndex(line.substring(COMMAND_UNMARK.length()).trim(), tasks.size());
+                    int taskIndex = tasks.parseTaskIndex(line.substring(COMMAND_UNMARK.length()).trim());
                     tasks.get(taskIndex).markAsNotDone();
                     saveTasks(storage, tasks);
 
@@ -116,8 +106,6 @@ public class Vigil {
                     System.out.println("  " + tasks.get(taskIndex));
 
                 } else if (line.equals(COMMAND_DEADLINE) || line.startsWith(COMMAND_DEADLINE + " ")) {
-                    ensureCapacity(tasks.size());
-
                     String rest = line.equals(COMMAND_DEADLINE)
                             ? ""
                             : line.substring(COMMAND_DEADLINE.length()).trim();
@@ -133,8 +121,6 @@ public class Vigil {
                     printTaskAdded(task, tasks.size());
 
                 } else if (line.equals(COMMAND_EVENT) || line.startsWith(COMMAND_EVENT + " ")) {
-                    ensureCapacity(tasks.size());
-
                     String rest = line.equals(COMMAND_EVENT)
                             ? ""
                             : line.substring(COMMAND_EVENT.length()).trim();
@@ -161,8 +147,8 @@ public class Vigil {
                         throw new VigilException("Missing task number. Use: delete <task number>.");
                     }
 
-                    int taskIndex = parseTaskIndex(line.substring(COMMAND_DELETE.length()).trim(), tasks.size());
-                    Task removedTask = tasks.remove(taskIndex);
+                    int taskIndex = tasks.parseTaskIndex(line.substring(COMMAND_DELETE.length()).trim());
+                    Task removedTask = tasks.delete(taskIndex);
                     saveTasks(storage, tasks);
 
                     System.out.println("Vigil confirms termination. Task removed:");
@@ -184,15 +170,8 @@ public class Vigil {
         printDivider();
     }
 
-    private static void ensureCapacity(int taskCount) throws VigilException {
-        if (taskCount >= MAX_TASKS) {
-            throw new VigilException("Task limit reached. Cannot add more than " + MAX_TASKS + " tasks.");
-        }
-    }
-
-    private static void saveTasks(Storage storage, ArrayList<Task> tasks) throws VigilException {
-        Task[] tasksArray = tasks.toArray(new Task[0]);
-        storage.save(tasksArray, tasks.size());
+    private static void saveTasks(Storage storage, TaskList tasks) throws VigilException {
+        storage.save(tasks.toArray(), tasks.size());
     }
 
     private static void printTaskAdded(Task task, int taskCount) {
@@ -203,24 +182,5 @@ public class Vigil {
 
     private static void printDivider() {
         System.out.println("_______________________________________________________________________________");
-    }
-
-    private static int parseTaskIndex(String raw, int taskCount) throws VigilException {
-        if (taskCount == 0) {
-            throw new VigilException("No tasks found. Add a task first.");
-        }
-
-        int taskNumber;
-        try {
-            taskNumber = Integer.parseInt(raw);
-        } catch (NumberFormatException e) {
-            throw new VigilException("Invalid task number.");
-        }
-
-        int taskIndex = taskNumber - 1;
-        if (taskIndex < 0 || taskIndex >= taskCount) {
-            throw new VigilException("Task number out of range. Use 1 to " + taskCount + ".");
-        }
-        return taskIndex;
     }
 }
