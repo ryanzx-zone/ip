@@ -21,6 +21,10 @@ public class Deadline extends Task {
         return by;
     }
 
+    public LocalDate getByDate() {
+        return byDate;
+    }
+
     private static LocalDate parseDate(String raw) {
         try {
             return LocalDate.parse(raw);

@@ -7,9 +7,13 @@ import vigil.command.EventCommand;
 import vigil.command.ExitCommand;
 import vigil.command.ListCommand;
 import vigil.command.MarkCommand;
+import vigil.command.ScheduleCommand;
 import vigil.command.TodoCommand;
 import vigil.command.UnmarkCommand;
 import vigil.exception.VigilException;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public class Parser {
 
@@ -20,6 +24,7 @@ public class Parser {
     private static final String COMMAND_EVENT = "event";
     private static final String COMMAND_LIST = "list";
     private static final String COMMAND_DELETE = "delete";
+    private static final String COMMAND_SCHEDULE = "schedule";
     private static final String COMMAND_BYE = "bye";
 
     public static Command parse(String fullCommand) throws VigilException {
@@ -53,6 +58,10 @@ public class Parser {
 
         if (fullCommand.equals(COMMAND_DELETE) || fullCommand.startsWith(COMMAND_DELETE + " ")) {
             return parseDelete(fullCommand);
+        }
+
+        if (fullCommand.equals(COMMAND_SCHEDULE) || fullCommand.startsWith(COMMAND_SCHEDULE + " ")) {
+            return parseSchedule(fullCommand);
         }
 
         throw new VigilException("Command not recognised.");
@@ -120,5 +129,20 @@ public class Parser {
             throw new VigilException("Missing task number. Use: delete <task number>.");
         }
         return new DeleteCommand(fullCommand.substring(COMMAND_DELETE.length()).trim());
+    }
+
+    private static Command parseSchedule(String fullCommand) throws VigilException {
+        String rest = fullCommand.equals(COMMAND_SCHEDULE)
+                ? ""
+                : fullCommand.substring(COMMAND_SCHEDULE.length()).trim();
+        if (rest.isEmpty()) {
+            throw new VigilException("Missing date. Use: schedule <yyyy-MM-dd>");
+        }
+        try {
+            LocalDate date = LocalDate.parse(rest);
+            return new ScheduleCommand(date);
+        } catch (DateTimeParseException e) {
+            throw new VigilException("Invalid date format. Use: schedule <yyyy-MM-dd>");
+        }
     }
 }

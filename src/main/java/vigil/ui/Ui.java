@@ -1,5 +1,8 @@
 package vigil.ui;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import vigil.task.Task;
@@ -57,7 +60,7 @@ public class Ui {
 
     public void showLoadingError(String message) {
         System.out.println("Vigil alert: " + message);
-        System.out.println("Save data could not be loaded. Starting with an empty task list.");
+        System.out.println("Vigil will start with an empty task list.");
     }
 
     public void showTaskList(TaskList tasks) {
@@ -87,5 +90,17 @@ public class Ui {
         System.out.println("Vigil confirms termination. Task removed:");
         System.out.println("  " + task);
         System.out.println(taskCount + " tasks currently under Vigil's watch.");
+    }
+
+    public void showTasksOnDate(ArrayList<Task> tasks, LocalDate date) {
+        String formattedDate = date.format(DateTimeFormatter.ofPattern("MMM d yyyy"));
+        System.out.println("Vigil scan for " + formattedDate + ":");
+        if (tasks.isEmpty()) {
+            System.out.println("No tasks found on this date.");
+        } else {
+            for (int i = 0; i < tasks.size(); i++) {
+                System.out.println((i + 1) + ". " + tasks.get(i));
+            }
+        }
     }
 }

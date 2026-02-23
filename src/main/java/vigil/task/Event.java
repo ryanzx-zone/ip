@@ -29,6 +29,14 @@ public class Event extends Task {
         return to;
     }
 
+    public LocalDate getFromDate() {
+        return fromDate;
+    }
+
+    public LocalDate getToDate() {
+        return toDate;
+    }
+
     private static LocalDate parseDate(String raw) {
         try {
             return LocalDate.parse(raw);
