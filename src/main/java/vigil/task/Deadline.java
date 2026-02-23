@@ -1,20 +1,37 @@
 package vigil.task;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 public class Deadline extends Task {
 
+    private static final DateTimeFormatter OUTPUT_FORMAT = DateTimeFormatter.ofPattern("MMM d yyyy");
+
     protected String by;
+    protected LocalDate byDate;
 
     public Deadline(String description, String by) {
         super(description);
         this.by = by;
+        this.byDate = parseDate(by);
     }
 
     public String getBy() {
         return by;
     }
 
+    private static LocalDate parseDate(String raw) {
+        try {
+            return LocalDate.parse(raw);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + by + ")";
+        String displayBy = (byDate != null) ? byDate.format(OUTPUT_FORMAT) : by;
+        return "[D]" + super.toString() + " (by: " + displayBy + ")";
     }
 }
