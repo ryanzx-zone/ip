@@ -61,6 +61,9 @@ public class TaskList {
 
         int taskIndex = taskNumber - 1;
         if (taskIndex < 0 || taskIndex >= tasks.size()) {
+            if (tasks.size() == 1) {
+                throw new VigilException("Task number out of range. There is only 1 task.");
+            }
             throw new VigilException("Task number out of range. Use 1 to " + tasks.size() + ".");
         }
         return taskIndex;
