@@ -103,4 +103,15 @@ public class Ui {
             }
         }
     }
+
+    public void showFindResults(ArrayList<Task> tasks, String keyword) {
+        System.out.println("Vigil scan for \"" + keyword + "\":");
+        if (tasks.isEmpty()) {
+            System.out.println("No matching tasks found.");
+        } else {
+            for (int i = 0; i < tasks.size(); i++) {
+                System.out.println((i + 1) + ". " + tasks.get(i));
+            }
+        }
+    }
 }
