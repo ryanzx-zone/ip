@@ -4,6 +4,10 @@ import java.util.ArrayList;
 
 import vigil.exception.VigilException;
 
+/**
+ * Represents a list of tasks with operations to add, delete, and retrieve tasks.
+ * Enforces a maximum capacity of {@value MAX_TASKS} tasks.
+ */
 public class TaskList {
 
     private static final int MAX_TASKS = 100;
@@ -14,6 +18,10 @@ public class TaskList {
         this.tasks = new ArrayList<>();
     }
 
+    /**
+     * Constructs a TaskList pre-populated with the given tasks,
+     * silently truncating if the array exceeds maximum capacity.
+     */
     public TaskList(Task[] loadedTasks) {
         this.tasks = new ArrayList<>();
         for (Task task : loadedTasks) {
@@ -47,6 +55,10 @@ public class TaskList {
         return tasks.toArray(new Task[0]);
     }
 
+    /**
+     * Parses a user-entered task number string into a zero-based index,
+     * validating that the number is within the range of existing tasks.
+     */
     public int parseTaskIndex(String raw) throws VigilException {
         if (tasks.isEmpty()) {
             throw new VigilException("No tasks found. Add a task first.");
@@ -61,9 +73,6 @@ public class TaskList {
 
         int taskIndex = taskNumber - 1;
         if (taskIndex < 0 || taskIndex >= tasks.size()) {
-            if (tasks.size() == 1) {
-                throw new VigilException("Task number out of range. There is only 1 task.");
-            }
             throw new VigilException("Task number out of range. Use 1 to " + tasks.size() + ".");
         }
         return taskIndex;

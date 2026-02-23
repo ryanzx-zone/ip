@@ -7,10 +7,18 @@ import vigil.task.Todo;
 import vigil.task.Task;
 import vigil.ui.Ui;
 
+/**
+ * Represents a command to add a new todo task.
+ */
 public class TodoCommand extends Command {
 
     private final String description;
 
+    /**
+     * Constructs a TodoCommand with the given description.
+     *
+     * @param description Description of the todo task.
+     */
     public TodoCommand(String description) {
         this.description = description;
     }

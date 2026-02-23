@@ -6,6 +6,9 @@ import vigil.task.Task;
 import vigil.task.TaskList;
 import vigil.ui.Ui;
 
+/**
+ * Represents a command to delete a task by its displayed index.
+ */
 public class DeleteCommand extends Command {
 
     private final String rawIndex;

@@ -13,6 +13,11 @@ import vigil.task.Event;
 import vigil.task.Task;
 import vigil.task.Todo;
 
+/**
+ * Handles loading and saving of tasks to a text file.
+ * Tasks are stored in a pipe-delimited format, one task per line.
+ * For example: {@code T | 0 | read book} or {@code D | 1 | report | sunday}.
+ */
 public class Storage {
 
     private static final String TYPE_TODO = "T";
@@ -28,6 +33,13 @@ public class Storage {
         this.filePath = Path.of(folderName, fileName);
     }
 
+    /**
+     * Loads tasks from the save file.
+     * Returns an empty array if the file does not exist.
+     *
+     * @return An array of tasks loaded from the file.
+     * @throws VigilException If the file exists but cannot be read or contains corrupted data.
+     */
     public Task[] load() throws VigilException {
         if (!Files.exists(filePath)) {
             return new Task[0];
@@ -51,6 +63,13 @@ public class Storage {
         return tasks.toArray(new Task[0]);
     }
 
+    /**
+     * Saves the given tasks to the save file, creating the parent directory if needed.
+     *
+     * @param tasks Array of tasks to save.
+     * @param taskCount Number of tasks in the array to save.
+     * @throws VigilException If the file cannot be written to.
+     */
     public void save(Task[] tasks, int taskCount) throws VigilException {
         try {
             Path parent = filePath.getParent();
@@ -69,6 +88,19 @@ public class Storage {
         }
     }
 
+    /**
+     * Parses a single line from the save file into a Task object.
+     * Expected formats:
+     * <ul>
+     *   <li>{@code T | 0 | description}</li>
+     *   <li>{@code D | 0 | description | by}</li>
+     *   <li>{@code E | 0 | description | from | to}</li>
+     * </ul>
+     *
+     * @param line The line to parse.
+     * @return The corresponding Task object.
+     * @throws VigilException If the line format is invalid or unrecognised.
+     */
     private static Task parseLine(String line) throws VigilException {
         String[] parts = line.split(SPLIT_REGEX);
 
@@ -120,14 +152,12 @@ public class Storage {
             return TYPE_TODO + SEPARATOR + doneFlag + SEPARATOR + task.getDescription();
         }
 
-        if (task instanceof Deadline) {
-            Deadline deadline = (Deadline) task;
+        if (task instanceof Deadline deadline) {
             return TYPE_DEADLINE + SEPARATOR + doneFlag + SEPARATOR + deadline.getDescription()
                     + SEPARATOR + deadline.getBy();
         }
 
-        if (task instanceof Event) {
-            Event event = (Event) task;
+        if (task instanceof Event event) {
             return TYPE_EVENT + SEPARATOR + doneFlag + SEPARATOR + event.getDescription()
                     + SEPARATOR + event.getFrom()
                     + SEPARATOR + event.getTo();

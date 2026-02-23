@@ -7,6 +7,11 @@ import vigil.storage.Storage;
 import vigil.task.TaskList;
 import vigil.ui.Ui;
 
+/**
+ * Represents the main entry point of the Vigil chatbot application.
+ * Vigil is a task management chatbot that supports todos, deadlines,
+ * and events with persistent storage.
+ */
 public class Vigil {
 
     private static final String DATA_FOLDER = "data";
@@ -16,6 +21,13 @@ public class Vigil {
     private final Ui ui;
     private TaskList tasks;
 
+    /**
+     * Constructs a Vigil instance and loads saved tasks from the specified file.
+     * If loading fails, starts with an empty task list instead.
+     *
+     * @param dataFolder Folder containing the save file.
+     * @param dataFile Name of the save file.
+     */
     public Vigil(String dataFolder, String dataFile) {
         ui = new Ui();
         storage = new Storage(dataFolder, dataFile);
@@ -27,6 +39,10 @@ public class Vigil {
         }
     }
 
+    /**
+     * Runs the main command loop, reading and executing user commands
+     * until an exit command is received.
+     */
     public void run() {
         ui.showWelcome();
 

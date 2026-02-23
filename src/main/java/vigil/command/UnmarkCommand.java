@@ -5,6 +5,9 @@ import vigil.storage.Storage;
 import vigil.task.TaskList;
 import vigil.ui.Ui;
 
+/**
+ * Represents a command to mark a task as not done.
+ */
 public class UnmarkCommand extends Command {
 
     private final String rawIndex;

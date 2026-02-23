@@ -4,11 +4,14 @@ import vigil.storage.Storage;
 import vigil.task.TaskList;
 import vigil.ui.Ui;
 
+/**
+ * Command that signals the application to exit.
+ */
 public class ExitCommand extends Command {
 
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
-        // nothing to do
+        // No action required.
     }
 
     @Override

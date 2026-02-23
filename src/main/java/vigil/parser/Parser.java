@@ -16,6 +16,9 @@ import vigil.exception.VigilException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Parses user input into executable {@link Command} objects.
+ */
 public class Parser {
 
     private static final String COMMAND_TODO = "todo";
@@ -29,6 +32,13 @@ public class Parser {
     private static final String COMMAND_SCHEDULE = "schedule";
     private static final String COMMAND_BYE = "bye";
 
+    /**
+     * Parses a full user command string and returns the appropriate Command.
+     *
+     * @param fullCommand The raw user input string.
+     * @return The Command corresponding to the user input.
+     * @throws VigilException If the command is not recognized or has invalid arguments.
+     */
     public static Command parse(String fullCommand) throws VigilException {
         if (fullCommand.equalsIgnoreCase(COMMAND_BYE)) {
             return new ExitCommand();
