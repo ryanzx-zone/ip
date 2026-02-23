@@ -5,6 +5,9 @@ import vigil.storage.Storage;
 import vigil.task.TaskList;
 import vigil.ui.Ui;
 
+/**
+ * Represents a command to mark a task as done.
+ */
 public class MarkCommand extends Command {
 
     private final String rawIndex;

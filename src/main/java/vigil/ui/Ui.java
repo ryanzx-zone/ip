@@ -8,6 +8,10 @@ import java.util.Scanner;
 import vigil.task.Task;
 import vigil.task.TaskList;
 
+/**
+ * Handles all user interaction for the Vigil chatbot.
+ * Responsible for reading user input and displaying messages to the console.
+ */
 public class Ui {
 
     private static final String DIVIDER =

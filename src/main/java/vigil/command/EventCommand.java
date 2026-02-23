@@ -7,6 +7,9 @@ import vigil.task.Task;
 import vigil.task.TaskList;
 import vigil.ui.Ui;
 
+/**
+ * Represents a command to add a new event task with a start and end time.
+ */
 public class EventCommand extends Command {
 
     private final String description;
