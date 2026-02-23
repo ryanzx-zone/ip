@@ -5,6 +5,7 @@ import vigil.command.DeadlineCommand;
 import vigil.command.DeleteCommand;
 import vigil.command.EventCommand;
 import vigil.command.ExitCommand;
+import vigil.command.FindCommand;
 import vigil.command.ListCommand;
 import vigil.command.MarkCommand;
 import vigil.command.ScheduleCommand;
@@ -24,6 +25,7 @@ public class Parser {
     private static final String COMMAND_EVENT = "event";
     private static final String COMMAND_LIST = "list";
     private static final String COMMAND_DELETE = "delete";
+    private static final String COMMAND_FIND = "find";
     private static final String COMMAND_SCHEDULE = "schedule";
     private static final String COMMAND_BYE = "bye";
 
@@ -62,6 +64,10 @@ public class Parser {
 
         if (fullCommand.equals(COMMAND_SCHEDULE) || fullCommand.startsWith(COMMAND_SCHEDULE + " ")) {
             return parseSchedule(fullCommand);
+        }
+
+        if (fullCommand.equals(COMMAND_FIND) || fullCommand.startsWith(COMMAND_FIND + " ")) {
+            return parseFind(fullCommand);
         }
 
         throw new VigilException("Command not recognised.");
@@ -144,5 +150,15 @@ public class Parser {
         } catch (DateTimeParseException e) {
             throw new VigilException("Invalid date format. Use: schedule <yyyy-MM-dd>");
         }
+    }
+
+    private static Command parseFind(String fullCommand) throws VigilException {
+        String keyword = fullCommand.equals(COMMAND_FIND)
+                ? ""
+                : fullCommand.substring(COMMAND_FIND.length()).trim();
+        if (keyword.isEmpty()) {
+            throw new VigilException("Missing keyword. Use: find <keyword>");
+        }
+        return new FindCommand(keyword);
     }
 }
