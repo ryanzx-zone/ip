@@ -20,6 +20,9 @@ public class Deadline extends Task {
      * Constructs a Deadline with the given description and due date string.
      * If {@code by} is in {@code yyyy-MM-dd} format, it is also parsed
      * as a {@link LocalDate} for formatted display and date queries.
+     *
+     * @param description Description of the deadline task.
+     * @param by Due date as a string.
      */
     public Deadline(String description, String by) {
         super(description);
