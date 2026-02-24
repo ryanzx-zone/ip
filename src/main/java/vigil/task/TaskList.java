@@ -21,6 +21,8 @@ public class TaskList {
     /**
      * Constructs a TaskList pre-populated with the given tasks,
      * silently truncating if the array exceeds maximum capacity.
+     *
+     * @param loadedTasks Array of tasks to load.
      */
     public TaskList(Task[] loadedTasks) {
         this.tasks = new ArrayList<>();
@@ -32,6 +34,12 @@ public class TaskList {
         }
     }
 
+    /**
+     * Adds a task to the list.
+     *
+     * @param task The task to add.
+     * @throws VigilException If the task list has reached maximum capacity.
+     */
     public void add(Task task) throws VigilException {
         if (tasks.size() >= MAX_TASKS) {
             throw new VigilException("Task limit reached. Cannot add more than " + MAX_TASKS + " tasks.");
@@ -58,6 +66,10 @@ public class TaskList {
     /**
      * Parses a user-entered task number string into a zero-based index,
      * validating that the number is within the range of existing tasks.
+     *
+     * @param raw The task number string as entered by the user (1-based).
+     * @return The corresponding zero-based index.
+     * @throws VigilException If the input is not a valid number or is out of range.
      */
     public int parseTaskIndex(String raw) throws VigilException {
         if (tasks.isEmpty()) {

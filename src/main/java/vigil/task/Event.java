@@ -22,6 +22,10 @@ public class Event extends Task {
      * Constructs an Event with the given description, start, and end strings.
      * If {@code from} or {@code to} are in {@code yyyy-MM-dd} format, they are
      * also parsed as {@link LocalDate} values for formatted display and date queries.
+     *
+     * @param description Description of the event.
+     * @param from Start date or time as a string.
+     * @param to End date or time as a string.
      */
     public Event(String description, String from, String to) {
         super(description);
