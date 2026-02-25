@@ -23,14 +23,19 @@ schedule
 schedule abc
 schedule 2025-03-15
 schedule 2025-03-20
+find
+find book
+find BOOK
+find nothing
 blah
 list
 delete
 delete abc
 delete 0
 delete 5
-delete 2
 list
+delete 1
+delete 1
 delete 1
 delete 1
 delete 1
