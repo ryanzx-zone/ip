@@ -8,7 +8,7 @@ Vigil is a **command-line task management chatbot** that helps you track todos, 
 2. Download the latest `Vigil.jar` from [here](https://github.com/ryanzx-zone/ip/releases).
 3. Open a terminal, navigate to the folder containing the jar file, and run:
    ```
-   java -jar vigil.jar
+   java -jar Vigil.jar
    ```
 4. Type a command and press Enter. Refer to the [Features](#features) section below for details on each command.
 
